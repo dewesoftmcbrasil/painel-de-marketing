@@ -1,0 +1,874 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEWESoft Brasil — Marketing Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --orange: #FF6600;
+  --orange-light: #FF8C3A;
+  --orange-dim: rgba(255,102,0,0.15);
+  --bg: #111111;
+  --card: #1c1c1c;
+  --card2: #252525;
+  --card3: #2e2e2e;
+  --text: #ffffff;
+  --text2: #aaaaaa;
+  --text3: #666666;
+  --border: #333333;
+  --green: #4CAF50;
+  --red: #F44336;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* HEADER */
+.header{background:#000;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;border-bottom:3px solid var(--orange)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo svg{width:32px;height:32px}
+.logo-text{font-size:22px;font-weight:700;letter-spacing:1px;color:#fff}
+.logo-text span{color:var(--orange)}
+.header-right{display:flex;align-items:center;gap:16px}
+.last-update{font-size:12px;color:var(--text3)}
+.last-update strong{color:var(--text2)}
+.badge-live{background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange);font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:0.5px}
+
+/* SUBTITLE BAR */
+.subtitle-bar{background:#1a1a1a;padding:10px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.subtitle-bar h1{font-size:13px;font-weight:600;color:var(--text2);letter-spacing:2px;text-transform:uppercase}
+.subtitle-bar h1 span{color:var(--orange)}
+.period-badge{font-size:11px;color:var(--text3);background:var(--card);padding:4px 10px;border-radius:4px;border:1px solid var(--border)}
+
+/* TABS */
+.tabs{display:flex;background:#161616;border-bottom:1px solid var(--border);padding:0 32px}
+.tab{padding:14px 20px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text3);border-bottom:3px solid transparent;letter-spacing:0.5px;transition:all .2s;white-space:nowrap}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.tab-icon{margin-right:6px}
+
+/* CONTENT */
+.content{padding:24px 32px;max-width:1600px;margin:0 auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* GRID HELPERS */
+.row{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.col{flex:1;min-width:180px}
+.col-2{flex:2;min-width:280px}
+.col-3{flex:3;min-width:340px}
+
+/* KPI CARDS */
+.kpi{background:var(--orange);border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;min-width:160px}
+.kpi-dark{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;min-width:160px}
+.kpi-label{font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;opacity:.85;margin-bottom:10px}
+.kpi-value{font-size:38px;font-weight:800;line-height:1;letter-spacing:-1px}
+.kpi-dark .kpi-value{color:var(--text)}
+.kpi-sub{font-size:12px;margin-top:8px;opacity:.8}
+.kpi-delta{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:700;margin-top:6px}
+.kpi-delta.up{color:var(--orange)}
+.kpi-delta.up-green{color:var(--green)}
+.kpi-delta.down{color:var(--red)}
+
+/* METRIC CHIPS */
+.metrics-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.metric-chip{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 20px;flex:1;min-width:150px}
+.metric-chip-label{font-size:11px;color:var(--text2);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px}
+.metric-chip-val{font-size:26px;font-weight:800;color:var(--text)}
+.metric-chip-sub{font-size:11px;color:var(--text3);margin-top:4px}
+
+/* SECTION HEADER */
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--orange);border-radius:2px}
+
+/* CHART CARDS */
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 22px}
+.chart-card h3{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:16px}
+.chart-wrap{position:relative}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:var(--card3);color:var(--text2);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;font-size:10px;padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(255,102,0,.06)}
+.data-table .total{background:var(--card3);font-weight:700}
+.data-table .total td{color:var(--text);border-top:2px solid var(--border)}
+.pill{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700}
+.pill-orange{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange)}
+.pill-green{background:rgba(76,175,80,.15);color:#81c784;border:1px solid rgba(76,175,80,.3)}
+.pill-red{background:rgba(244,67,54,.15);color:#ef9a9a;border:1px solid rgba(244,67,54,.3)}
+.pill-gray{background:rgba(255,255,255,.08);color:var(--text2);border:1px solid var(--border)}
+
+/* INSIGHTS */
+.insights-box{background:linear-gradient(135deg,#1c1c1c,#252525);border:1px solid var(--border);border-left:4px solid var(--orange);border-radius:10px;padding:20px 24px;margin-top:16px}
+.insights-box h3{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:14px}
+.insight-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px;color:var(--text2);line-height:1.5}
+.insight-item:last-child{margin-bottom:0}
+.insight-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:20px 0}
+
+/* FUNNEL */
+.funnel{display:flex;align-items:flex-end;gap:0;justify-content:center;height:160px;padding:0 20px}
+.funnel-bar-wrap{display:flex;flex-direction:column;align-items:center;flex:1}
+.funnel-bar{width:80%;border-radius:6px 6px 0 0;background:var(--orange);transition:height .6s}
+.funnel-bar-label{font-size:11px;color:var(--text3);margin-top:6px;text-align:center}
+.funnel-bar-val{font-size:16px;font-weight:800;color:var(--text);text-align:center;margin-top:2px}
+.funnel-arrow{font-size:20px;color:var(--text3);align-self:center;margin-bottom:24px;flex-shrink:0}
+
+/* EVENTO CARDS */
+.evt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.evt-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.evt-card-orange{background:var(--orange);border-radius:10px;padding:18px 20px}
+.evt-label{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;color:rgba(255,255,255,.75)}
+.evt-val{font-size:28px;font-weight:800;line-height:1;color:#fff}
+.evt-sub{font-size:12px;color:var(--text2);margin-top:6px}
+.evt-sub-orange{font-size:12px;color:rgba(255,255,255,.8);margin-top:6px}
+.evt-mult{font-size:13px;font-weight:700;color:var(--orange);margin-top:4px}
+
+/* SOCIAL PLATFORM HEADER */
+.platform-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.platform-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff}
+.platform-icon.li{background:#0A66C2}
+.platform-icon.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}
+.platform-name{font-size:16px;font-weight:800;color:var(--text)}
+
+/* SCROLLABLE TABLE WRAP */
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .tabs{overflow-x:auto}
+  .tab{padding:12px 14px;font-size:12px}
+  .content{padding:16px}
+  .header{padding:0 16px}
+  .evt-grid{grid-template-columns:repeat(2,1fr)}
+  .kpi-value{font-size:28px}
+}
+@media(max-width:600px){
+  .evt-grid{grid-template-columns:1fr}
+  .row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <svg viewBox="0 0 800 709.9" width="40" height="36" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#F15D2E" d="M26.3,692.8c116.1,11,242.1,17.1,373.7,17.1c131.6,0,257.6-6,373.7-17.1L400,477.1L26.3,692.8z"/>
+      <path fill="#F15D2E" d="M0,647.2C48.5,541.1,106.3,429,172.1,315.1c65.8-114,134-220,201.6-315.1v431.5L0,647.2z"/>
+      <path fill="#F15D2E" d="M800,647.2C751.5,541.1,693.7,429,627.9,315.1c-65.8-114-134-220-201.6-315.1v431.5L800,647.2z"/>
+    </svg>
+    <span class="logo-text" style="font-size:21px;font-weight:800;letter-spacing:0.5px">DEWE<span style="color:#E8541A">Soft</span><sup style="font-size:9px;color:#555;font-weight:400">®</sup></span>
+  </div>
+  <div class="header-right">
+    <span class="last-update">Atualizado em: <strong id="update-date">27/10/2026</strong></span>
+    <span class="badge-live">● BRASIL</span>
+  </div>
+</div>
+
+<!-- SUBTITLE -->
+<div class="subtitle-bar">
+  <h1>Marketing Dashboard — <span>Visão Completa</span></h1>
+  <span class="period-badge">📅 ago – out 2026</span>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('visao')"><span class="tab-icon">📊</span> Visão Geral</div>
+  <div class="tab" onclick="switchTab('social')"><span class="tab-icon">📱</span> Social Media</div>
+  <div class="tab" onclick="switchTab('email')"><span class="tab-icon">✉️</span> E-mail Marketing</div>
+  <div class="tab" onclick="switchTab('eventos')"><span class="tab-icon">🎯</span> Campanhas & Eventos</div>
+</div>
+
+<!-- ========================================================
+     TAB 1 — VISÃO GERAL
+     ======================================================== -->
+<div id="tab-visao" class="tab-panel active">
+<div class="content">
+
+  <!-- KPI ROW 1 -->
+  <div class="section-title">Atividade de Marketing</div>
+  <div class="row">
+    <div class="kpi col">
+      <div class="kpi-label">Publicações LinkedIn</div>
+      <div class="kpi-value" id="v-li-posts">9</div>
+    </div>
+    <div class="kpi col">
+      <div class="kpi-label">Publicações Instagram</div>
+      <div class="kpi-value" id="v-ig-posts">6</div>
+    </div>
+    <div class="kpi col">
+      <div class="kpi-label">Disparos de E-mail</div>
+      <div class="kpi-value" id="v-email-blasts">8</div>
+    </div>
+    <div class="kpi col">
+      <div class="kpi-label">Campanhas Cadastradas</div>
+      <div class="kpi-value" id="v-campaigns">1</div>
+    </div>
+  </div>
+
+  <!-- FOLLOWERS + MONTHLY CHART -->
+  <div class="row" style="margin-top:4px">
+    <div class="kpi-dark col" style="min-width:200px">
+      <div class="kpi-label" style="color:var(--text2)">Seguidores Instagram</div>
+      <div class="kpi-value" id="v-ig-followers">58</div>
+      <div class="kpi-sub" style="color:var(--text3)">Variação vs. mês anterior</div>
+      <div class="kpi-delta up" id="v-ig-delta">↑ +8 &nbsp;(+16,00%)</div>
+    </div>
+    <div class="kpi-dark col" style="min-width:200px">
+      <div class="kpi-label" style="color:var(--text2)">Seguidores LinkedIn</div>
+      <div class="kpi-value" id="v-li-followers">1.782</div>
+      <div class="kpi-sub" style="color:var(--text3)">Variação vs. mês anterior</div>
+      <div class="kpi-delta up" id="v-li-delta">↑ +33 &nbsp;(+1,89%)</div>
+    </div>
+    <div class="chart-card col-2">
+      <h3>Volume Mensal de Atividades</h3>
+      <div class="chart-wrap" style="height:150px">
+        <canvas id="chart-monthly-volume"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERFORMANCE METRICS -->
+  <div class="section-title" style="margin-top:8px">Indicadores de Performance</div>
+  <div class="metrics-row">
+    <div class="metric-chip">
+      <div class="metric-chip-label">Engajamento LinkedIn</div>
+      <div class="metric-chip-val" id="v-li-eng">35,23%</div>
+      <div class="metric-chip-sub">Engajamentos ÷ Impressões</div>
+    </div>
+    <div class="metric-chip">
+      <div class="metric-chip-label">CTR LinkedIn</div>
+      <div class="metric-chip-val" id="v-li-ctr">31,88%</div>
+      <div class="metric-chip-sub">Cliques ÷ Impressões</div>
+    </div>
+    <div class="metric-chip">
+      <div class="metric-chip-label">Engajamento Instagram</div>
+      <div class="metric-chip-val" id="v-ig-eng">4,37%</div>
+      <div class="metric-chip-sub">Engajamentos ÷ Visualizações</div>
+    </div>
+    <div class="metric-chip">
+      <div class="metric-chip-label">Abertura Única Email</div>
+      <div class="metric-chip-val" id="v-email-open">27,78%</div>
+      <div class="metric-chip-sub">Aberturas únicas ÷ Enviados</div>
+    </div>
+    <div class="metric-chip">
+      <div class="metric-chip-label">CTR Único Email</div>
+      <div class="metric-chip-val" id="v-email-ctr">3,06%</div>
+      <div class="metric-chip-sub">Cliques únicos ÷ Enviados</div>
+    </div>
+    <div class="metric-chip">
+      <div class="metric-chip-label">Taxa Descadastros</div>
+      <div class="metric-chip-val" id="v-email-unsub">0,27%</div>
+      <div class="metric-chip-sub">Descadastros ÷ Enviados</div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="insights-box">
+    <h3>💡 Insights do Período</h3>
+    <div class="insight-item"><span class="insight-icon">🏆</span>O LinkedIn é o canal de maior alcance: <strong>6.392 impressões</strong> e taxa de engajamento de <strong>35,23%</strong> — bem acima da média de mercado B2B (~2–5%).</div>
+    <div class="insight-item"><span class="insight-icon">📈</span>LinkedIn cresceu <strong>+33 seguidores (+1,89%)</strong> no mês, totalizando <strong>1.782</strong>. Instagram avançou <strong>+8 (+16%)
+</strong> — crescimento percentual expressivo para uma conta em fase de construção.</div>
+    <div class="insight-item"><span class="insight-icon">✉️</span>Taxa de abertura única de <strong>27,78%</strong> está acima da média de mercado B2B (~20%). Descadastros em apenas <strong>0,27%</strong> — excelente qualidade de lista.</div>
+    <div class="insight-item"><span class="insight-icon">🎯</span>A campanha do <strong>MC Brasil 2026</strong> gerou <strong>137 participantes</strong> de <strong>206 inscritos</strong> — taxa de conversão de 66,5%.</div>
+    <div class="insight-item"><span class="insight-icon">⚡</span>Carrosséis LinkedIn performam muito melhor: taxa de engajamento média de <strong>57–77%</strong> vs <strong>~8%</strong> nos posts de imagem.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ========================================================
+     TAB 2 — SOCIAL MEDIA
+     ======================================================== -->
+<div id="tab-social" class="tab-panel">
+<div class="content">
+
+  <!-- LINKEDIN -->
+  <div class="platform-header">
+    <div class="platform-icon li">in</div>
+    <span class="platform-name">LinkedIn</span>
+  </div>
+  <div class="row">
+    <div class="kpi col">
+      <div class="kpi-label">Publicações</div>
+      <div class="kpi-value">9</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Impressões</div>
+      <div class="kpi-value">6.392</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Engajamentos</div>
+      <div class="kpi-value">2.252</div>
+      <div class="kpi-delta up" style="margin-top:6px">↑ 35,23%</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Cliques</div>
+      <div class="kpi-value">2.038</div>
+      <div class="kpi-delta up" style="margin-top:6px">↑ 31,88%</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Seguidores</div>
+      <div class="kpi-value">1.782</div>
+      <div class="kpi-delta up" style="margin-top:6px">↑ +33 MoM</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="chart-card col-2">
+      <h3>Top 5 Publicações — Engajamento</h3>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="chart-li-top5"></canvas>
+      </div>
+    </div>
+    <div class="chart-card col">
+      <h3>Volume Mensal por Formato</h3>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="chart-li-format"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Publicações LinkedIn — Detalhe</div>
+  <div class="table-wrap">
+    <table class="data-table" id="table-li-posts"></table>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- INSTAGRAM -->
+  <div class="platform-header" style="margin-top:4px">
+    <div class="platform-icon ig">📷</div>
+    <span class="platform-name">Instagram</span>
+  </div>
+  <div class="row">
+    <div class="kpi col">
+      <div class="kpi-label">Publicações</div>
+      <div class="kpi-value">6</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Visualizações</div>
+      <div class="kpi-value">1.396</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Engajamentos</div>
+      <div class="kpi-value">61</div>
+      <div class="kpi-delta up" style="margin-top:6px">↑ 4,37%</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Visitas ao Perfil</div>
+      <div class="kpi-value">10</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Seguidores</div>
+      <div class="kpi-value">58</div>
+      <div class="kpi-delta up" style="margin-top:6px">↑ +8 MoM</div>
+    </div>
+  </div>
+
+  <div class="section-title">Publicações Instagram — Detalhe</div>
+  <div class="table-wrap">
+    <table class="data-table" id="table-ig-posts"></table>
+  </div>
+
+</div>
+</div>
+
+<!-- ========================================================
+     TAB 3 — E-MAIL MARKETING
+     ======================================================== -->
+<div id="tab-email" class="tab-panel">
+<div class="content">
+
+  <div class="row">
+    <div class="kpi col">
+      <div class="kpi-label">Disparos Realizados</div>
+      <div class="kpi-value">8</div>
+    </div>
+    <div class="kpi col">
+      <div class="kpi-label">E-mails Enviados</div>
+      <div class="kpi-value">17 Mil</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Abertura Única</div>
+      <div class="kpi-value">27,78%</div>
+      <div class="kpi-sub" style="color:var(--green);font-size:11px;margin-top:4px">✔ Acima da média B2B</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">CTR Único</div>
+      <div class="kpi-value">3,06%</div>
+    </div>
+    <div class="kpi-dark col">
+      <div class="kpi-label" style="color:var(--text2)">Descadastros</div>
+      <div class="kpi-value">0,27%</div>
+      <div class="kpi-sub" style="color:var(--green);font-size:11px;margin-top:4px">✔ Muito baixo</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="chart-card col-2">
+      <h3>Taxa de Abertura e CTR por Disparo</h3>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chart-email-line"></canvas>
+      </div>
+    </div>
+    <div class="chart-card col">
+      <h3>Top 5 — Taxa de Abertura</h3>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="chart-email-top5"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Performance por Disparo</div>
+  <div class="table-wrap">
+    <table class="data-table" id="table-email"></table>
+  </div>
+
+  <div class="insights-box" style="margin-top:16px">
+    <h3>💡 Insights — E-mail Marketing</h3>
+    <div class="insight-item"><span class="insight-icon">🥇</span><strong>"Do desafio à solução"</strong> foi o disparo de maior abertura: <strong>42,27%</strong>. Assunto técnico + relevância de conteúdo.</div>
+    <div class="insight-item"><span class="insight-icon">🎯</span>O e-mail de <strong>agradecimento pós-evento</strong> (133 envios) teve abertura de <strong>40,6%</strong> e CTR de <strong>21%</strong> — indicador de alta qualificação da base pós-evento.</div>
+    <div class="insight-item"><span class="insight-icon">🔄</span>Reenvios para quem não abriu (EMAIL-002, EMAIL-004) têm taxa de abertura 3–5× menor — comportamento esperado. Recomenda-se testar assuntos diferentes nesses reenvios.</div>
+    <div class="insight-item"><span class="insight-icon">📉</span>Apenas <strong>46 descadastros</strong> em 17.195 envios = lista bem segmentada e conteúdo relevante.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ========================================================
+     TAB 4 — CAMPANHAS & EVENTOS
+     ======================================================== -->
+<div id="tab-eventos" class="tab-panel">
+<div class="content">
+
+  <!-- CAMPAIGN -->
+  <div class="section-title">Campanha Ativa</div>
+  <div class="kpi-dark" style="margin-bottom:16px;padding:16px 20px;border-left:4px solid var(--orange)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-size:15px;font-weight:800;margin-bottom:4px">DEWESoft Measurement Conference Brasil 2026</div>
+        <div style="font-size:12px;color:var(--text2)">Canal: CRM &nbsp;|&nbsp; Objetivo: Oportunidades/Vendas &nbsp;|&nbsp; Início: 31/07/2026</div>
+      </div>
+      <span class="pill pill-orange">Em andamento</span>
+    </div>
+  </div>
+
+  <!-- EVENTO -->
+  <div class="section-title">Evento — MC Brasil 2026 (29–30 set 2026)</div>
+  <div class="evt-grid" style="margin-bottom:16px">
+    <div class="evt-card-orange">
+      <div class="evt-label">Inscritos</div>
+      <div class="evt-val">206</div>
+      <div class="evt-sub-orange">Total de inscrições recebidas</div>
+    </div>
+    <div class="evt-card-orange">
+      <div class="evt-label">Confirmados</div>
+      <div class="evt-val">160</div>
+      <div class="evt-sub-orange">77,7% dos inscritos</div>
+    </div>
+    <div class="evt-card-orange">
+      <div class="evt-label">Participantes</div>
+      <div class="evt-val">137</div>
+      <div class="evt-sub-orange">66,5% dos inscritos</div>
+    </div>
+    <div class="evt-card">
+      <div class="evt-label">Custo Total</div>
+      <div class="evt-val">R$ 182 Mil</div>
+      <div class="evt-sub">≈ € 30 Mil &nbsp;|&nbsp; Presencial, Indaiatuba</div>
+    </div>
+    <div class="evt-card">
+      <div class="evt-label">CRM Potencial</div>
+      <div class="evt-val">€ 131 Mil</div>
+      <div class="evt-mult">4,28× o custo</div>
+    </div>
+    <div class="evt-card">
+      <div class="evt-label">CRM Realizado</div>
+      <div class="evt-val">€ 9,9 Mil</div>
+      <div class="evt-mult" style="color:var(--text3)">Win rate: 11%</div>
+    </div>
+  </div>
+
+  <!-- FUNNEL -->
+  <div class="chart-card" style="margin-bottom:16px">
+    <h3>Funil do Evento</h3>
+    <div style="display:flex;align-items:flex-end;gap:0;justify-content:center;padding:0 20px;height:160px">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+        <div style="width:75%;background:var(--orange);border-radius:6px 6px 0 0;height:130px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800">206</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center">Inscritos<br><span style="font-size:10px">100%</span></div>
+      </div>
+      <div style="color:var(--text3);font-size:20px;padding:0 6px;margin-bottom:40px">›</div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+        <div style="width:75%;background:#cc5200;border-radius:6px 6px 0 0;height:101px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800">160</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center">Confirmados<br><span style="font-size:10px">77,7%</span></div>
+      </div>
+      <div style="color:var(--text3);font-size:20px;padding:0 6px;margin-bottom:40px">›</div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+        <div style="width:75%;background:#993d00;border-radius:6px 6px 0 0;height:87px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800">137</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center">Participantes<br><span style="font-size:10px">66,5%</span></div>
+      </div>
+      <div style="color:var(--text3);font-size:20px;padding:0 6px;margin-bottom:40px">›</div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+        <div style="width:75%;background:#662900;border-radius:6px 6px 0 0;height:50px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800">10</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center">Oportunidades<br><span style="font-size:10px">7,3%</span></div>
+      </div>
+      <div style="color:var(--text3);font-size:20px;padding:0 6px;margin-bottom:40px">›</div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+        <div style="width:75%;background:#331400;border-radius:6px 6px 0 0;height:8px;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;font-size:13px;font-weight:800">1</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;text-align:center">Pedidos<br><span style="font-size:10px">0,5%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRM CHART -->
+  <div class="chart-card">
+    <h3>CRM — Potencial vs. Realizado (€)</h3>
+    <div class="chart-wrap" style="height:140px">
+      <canvas id="chart-crm"></canvas>
+    </div>
+  </div>
+
+  <div class="insights-box" style="margin-top:16px">
+    <h3>💡 Insights — Eventos & CRM</h3>
+    <div class="insight-item"><span class="insight-icon">🎯</span>Taxa de comparecimento de <strong>66,5%</strong> (137/206 inscritos) — resultado sólido para evento presencial B2B técnico.</div>
+    <div class="insight-item"><span class="insight-icon">💰</span>Pipeline potencial de <strong>€ 131 Mil</strong> representa <strong>4,28× o custo do evento</strong> — ROI potencial positivo, mas win rate de <strong>11%</strong> ainda precisa de acompanhamento.</div>
+    <div class="insight-item"><span class="insight-icon">🔁</span><strong>10 oportunidades</strong> abertas e <strong>10 cotações</strong> realizadas — 100% de conversão de oportunidade em cotação é muito positivo.</div>
+    <div class="insight-item"><span class="insight-icon">📌</span>Follow-ups pendentes precisam ser acompanhados para aumentar o win rate além dos 11% atuais.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ========================================================
+     DATA + SCRIPTS
+     ======================================================== -->
+<script>
+// ============================================================
+// DADOS — atualize este bloco com o script atualizar_painel.py
+// ============================================================
+const DASH_DATA = {
+  updateDate: "27/10/2026",
+  summary: {
+    liPosts: 9, igPosts: 6, emailBlasts: 8, campaigns: 1,
+    igFollowers: 58, igDelta: 8, igDeltaPct: 0.16,
+    liFollowers: 1782, liDelta: 33, liDeltaPct: 0.0189,
+    liImpressions: 6392, liEngagements: 2252, liClicks: 2038,
+    liEngRate: 0.3523, liCTR: 0.3188,
+    igViews: 1396, igEngagements: 61, igVisitProfile: 10, igEngRate: 0.0437,
+    emailSent: 17195, emailOpenRate: 0.2778, emailCTR: 0.0306, emailUnsub: 0.0027
+  },
+  monthly: [
+    { mes: "ago/2026", li: 4, ig: 0, email: 5 },
+    { mes: "set/2026", li: 4, ig: 5, email: 2 },
+    { mes: "out/2026", li: 1, ig: 1, email: 1 }
+  ],
+  liPosts: [
+    { data:"13/08/2026", titulo:"DEWESoft Measurement Conference Brasil 2026", formato:"Imagem", impressoes:1544, engajamentos:184, taxaEng:0.1192, cliques:129, ctr:0.0835, reacoes:40, comentarios:7, compartilhamentos:8 },
+    { data:"18/08/2026", titulo:"O que acontece quando engenharia, tecnologia e conhecimento...", formato:"Carrossel", impressoes:911, engajamentos:558, taxaEng:0.6125, cliques:530, ctr:0.5818, reacoes:22, comentarios:1, compartilhamentos:5 },
+    { data:"25/08/2026", titulo:"Quais desafios de engenharia você quer transformar em resultados?", formato:"Carrossel", impressoes:979, engajamentos:751, taxaEng:0.7671, cliques:727, ctr:0.7426, reacoes:18, comentarios:1, compartilhamentos:5 },
+    { data:"31/08/2026", titulo:"Tecnologia só faz diferença quando transforma dados em decisões.", formato:"Imagem", impressoes:577, engajamentos:46, taxaEng:0.0797, cliques:26, ctr:0.0451, reacoes:16, comentarios:1, compartilhamentos:3 },
+    { data:"01/09/2026", titulo:"Faltam 28 dias. ⏳", formato:"Imagem", impressoes:524, engajamentos:46, taxaEng:0.0878, cliques:27, ctr:0.0515, reacoes:15, comentarios:1, compartilhamentos:3 },
+    { data:"10/09/2026", titulo:"🚀 A programação do Dia 1 da DEWESoft MC Brasil 2026...", formato:"Carrossel", impressoes:841, engajamentos:495, taxaEng:0.5886, cliques:468, ctr:0.5565, reacoes:22, comentarios:1, compartilhamentos:4 },
+    { data:"23/09/2026", titulo:"DEWESoft Measurement Conference Brasil 2026: programação completa!", formato:"Carrossel", impressoes:194, engajamentos:105, taxaEng:0.5412, cliques:97, ctr:0.5000, reacoes:7, comentarios:0, compartilhamentos:1 },
+    { data:"28/09/2026", titulo:"🚀 É AMANHÃ!", formato:"Imagem", impressoes:791, engajamentos:48, taxaEng:0.0607, cliques:25, ctr:0.0316, reacoes:18, comentarios:2, compartilhamentos:3 },
+    { data:"02/10/2026", titulo:"Dewesoft MC Brazil 2026 | Um pouco do que vivemos!", formato:"Vídeo", impressoes:31, engajamentos:19, taxaEng:0.6129, cliques:9, ctr:0.2903, reacoes:8, comentarios:0, compartilhamentos:2 }
+  ],
+  igPosts: [
+    { data:"10/09/2026", titulo:"DEWESoft Measurement Conference Brasil 2026", formato:"Carrossel", visualizacoes:124, curtidas:7, comentarios:0, compartilhamentos:1, engajamentos:8, taxaEng:0.0645 },
+    { data:"10/09/2026", titulo:"Quais desafios de engenharia você quer transformar...", formato:"Carrossel", visualizacoes:132, curtidas:4, comentarios:0, compartilhamentos:0, engajamentos:4, taxaEng:0.0303 },
+    { data:"10/09/2026", titulo:"🚀 A programação do Dia 1 da DEWESoft MC Brasil 2026...", formato:"Carrossel", visualizacoes:246, curtidas:5, comentarios:0, compartilhamentos:1, engajamentos:6, taxaEng:0.0244 },
+    { data:"23/09/2026", titulo:"DEWESoft MC Brasil 2026: programação completa!", formato:"Carrossel", visualizacoes:447, curtidas:13, comentarios:0, compartilhamentos:2, engajamentos:15, taxaEng:0.0336 },
+    { data:"28/09/2026", titulo:"🚀 É AMANHÃ!", formato:"Imagem", visualizacoes:396, curtidas:14, comentarios:0, compartilhamentos:2, engajamentos:16, taxaEng:0.0404 },
+    { data:"02/10/2026", titulo:"Dewesoft MC Brazil 2026 | Um pouco do que vivemos!", formato:"Vídeo", visualizacoes:51, curtidas:11, comentarios:0, compartilhamentos:0, engajamentos:12, taxaEng:0.2353 }
+  ],
+  emailDisparos: [
+    { id:"EMAIL-001", data:"18/08/2026", campanha:"Dewesoft MC Brasil 2026", enviados:2819, aberturaUnica:0.3466, ctrUnico:0.0582, descadastros:0.0032 },
+    { id:"EMAIL-002", data:"21/08/2026", campanha:"MC Brasil 2026 (reenvio — não leu/abriu 1)", enviados:1822, aberturaUnica:0.0873, ctrUnico:0.0126, descadastros:0.0027 },
+    { id:"EMAIL-003", data:"25/08/2026", campanha:"Do desafio à solução — conteúdo técnico", enviados:2749, aberturaUnica:0.4227, ctrUnico:0.0335, descadastros:0.0029 },
+    { id:"EMAIL-004", data:"27/08/2026", campanha:"Do desafio à solução (reenvio — não leu/abriu 1)", enviados:1593, aberturaUnica:0.0841, ctrUnico:0.0082, descadastros:0.0019 },
+    { id:"EMAIL-005", data:"31/08/2026", campanha:"O futuro de testes e medições começa aqui", enviados:2710, aberturaUnica:0.3472, ctrUnico:0.0118, descadastros:0.0033 },
+    { id:"EMAIL-006", data:"10/09/2026", campanha:"Keynotes, aplicações técnicas e cases reais", enviados:2688, aberturaUnica:0.2467, ctrUnico:0.0260, descadastros:0.0033 },
+    { id:"EMAIL-007", data:"23/09/2026", campanha:"Últimas vagas disponíveis — MC Brasil 2026", enviados:2681, aberturaUnica:0.2562, ctrUnico:0.0392, descadastros:0.0011 },
+    { id:"EMAIL-008", data:"02/10/2026", campanha:"Obrigado por fazer parte da MC Brasil 2026", enviados:133, aberturaUnica:0.4060, ctrUnico:0.2105, descadastros:0.0000 }
+  ],
+  evento: {
+    nome:"DEWESoft Measurement Conference Brasil 2026",
+    dataInicio:"29/09/2026", dataFim:"30/09/2026",
+    inscritos:206, confirmados:160, participantes:137,
+    oportunidades:10, cotacoes:10, pedidos:1,
+    custoTotal:182562, moedaCusto:"BRL",
+    custoEUR:30000,
+    crmPotencial:131900, moedaCRM:"EUR",
+    crmRealizado:9900, winRate:0.11
+  }
+};
+
+// ============================================================
+// HELPERS
+// ============================================================
+const fmt = (n, dec=2) => n.toLocaleString('pt-BR', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+const fmtPct = n => (n*100).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '%';
+const fmtN = n => n.toLocaleString('pt-BR');
+const ORANGE = '#FF6600';
+const ORANGE2 = '#cc5200';
+const DARK = '#2a2a2a';
+const GRAY = '#666';
+
+Chart.defaults.color = '#888';
+Chart.defaults.borderColor = '#2a2a2a';
+Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ============================================================
+// POPULATE DOM
+// ============================================================
+function populateDom() {
+  const d = DASH_DATA;
+  document.getElementById('update-date').textContent = d.updateDate;
+  document.getElementById('v-li-posts').textContent = d.summary.liPosts;
+  document.getElementById('v-ig-posts').textContent = d.summary.igPosts;
+  document.getElementById('v-email-blasts').textContent = d.summary.emailBlasts;
+  document.getElementById('v-campaigns').textContent = d.summary.campaigns;
+  document.getElementById('v-ig-followers').textContent = fmtN(d.summary.igFollowers);
+  document.getElementById('v-li-followers').textContent = fmtN(d.summary.liFollowers);
+  document.getElementById('v-ig-delta').innerHTML = `↑ +${d.summary.igDelta} &nbsp;(+${fmtPct(d.summary.igDeltaPct)})`;
+  document.getElementById('v-li-delta').innerHTML = `↑ +${d.summary.liDelta} &nbsp;(+${fmtPct(d.summary.liDeltaPct)})`;
+  document.getElementById('v-li-eng').textContent = fmtPct(d.summary.liEngRate);
+  document.getElementById('v-li-ctr').textContent = fmtPct(d.summary.liCTR);
+  document.getElementById('v-ig-eng').textContent = fmtPct(d.summary.igEngRate);
+  document.getElementById('v-email-open').textContent = fmtPct(d.summary.emailOpenRate);
+  document.getElementById('v-email-ctr').textContent = fmtPct(d.summary.emailCTR);
+  document.getElementById('v-email-unsub').textContent = fmtPct(d.summary.emailUnsub);
+}
+
+// ============================================================
+// TABLES
+// ============================================================
+function buildLITable() {
+  const t = document.getElementById('table-li-posts');
+  t.innerHTML = `<thead><tr>
+    <th>Data</th><th>Título</th><th>Formato</th>
+    <th>Impressões</th><th>Engajamentos</th><th>Eng %</th>
+    <th>Cliques</th><th>CTR</th><th>Reações</th>
+  </tr></thead><tbody>` +
+  DASH_DATA.liPosts.map(p => {
+    const fmt_tag = p.formato === 'Carrossel' ? 'pill-green' : p.formato === 'Vídeo' ? 'pill-orange' : 'pill-gray';
+    return `<tr>
+      <td style="white-space:nowrap;color:var(--text3)">${p.data}</td>
+      <td style="max-width:320px;font-size:11px;line-height:1.4">${p.titulo}</td>
+      <td><span class="pill ${fmt_tag}">${p.formato}</span></td>
+      <td>${fmtN(p.impressoes)}</td>
+      <td>${fmtN(p.engajamentos)}</td>
+      <td style="color:${p.taxaEng > 0.3 ? '#4CAF50' : p.taxaEng > 0.1 ? '#FF8C3A' : '#888'};font-weight:700">${fmtPct(p.taxaEng)}</td>
+      <td>${fmtN(p.cliques)}</td>
+      <td>${fmtPct(p.ctr)}</td>
+      <td>${p.reacoes}</td>
+    </tr>`;
+  }).join('') +
+  `<tr class="total"><td colspan="3">TOTAL</td>
+    <td>${fmtN(DASH_DATA.liPosts.reduce((a,p)=>a+p.impressoes,0))}</td>
+    <td>${fmtN(DASH_DATA.liPosts.reduce((a,p)=>a+p.engajamentos,0))}</td>
+    <td>${fmtPct(DASH_DATA.summary.liEngRate)}</td>
+    <td>${fmtN(DASH_DATA.liPosts.reduce((a,p)=>a+p.cliques,0))}</td>
+    <td>${fmtPct(DASH_DATA.summary.liCTR)}</td>
+    <td>${fmtN(DASH_DATA.liPosts.reduce((a,p)=>a+p.reacoes,0))}</td>
+  </tr></tbody>`;
+}
+
+function buildIGTable() {
+  const t = document.getElementById('table-ig-posts');
+  t.innerHTML = `<thead><tr>
+    <th>Data</th><th>Título</th><th>Formato</th>
+    <th>Visualizações</th><th>Curtidas</th><th>Compartilhamentos</th>
+    <th>Engajamentos</th><th>Eng %</th>
+  </tr></thead><tbody>` +
+  DASH_DATA.igPosts.map(p => `<tr>
+    <td style="white-space:nowrap;color:var(--text3)">${p.data}</td>
+    <td style="max-width:300px;font-size:11px">${p.titulo}</td>
+    <td><span class="pill ${p.formato==='Carrossel'?'pill-green':p.formato==='Vídeo'?'pill-orange':'pill-gray'}">${p.formato}</span></td>
+    <td>${fmtN(p.visualizacoes)}</td>
+    <td>${p.curtidas}</td>
+    <td>${p.compartilhamentos}</td>
+    <td>${p.engajamentos}</td>
+    <td style="color:${p.taxaEng>0.1?'#4CAF50':'#888'};font-weight:700">${fmtPct(p.taxaEng)}</td>
+  </tr>`).join('') + `</tbody>`;
+}
+
+function buildEmailTable() {
+  const t = document.getElementById('table-email');
+  const total = DASH_DATA.emailDisparos;
+  const totSent = total.reduce((a,e)=>a+e.enviados,0);
+  t.innerHTML = `<thead><tr>
+    <th>ID</th><th>Data</th><th>Campanha</th>
+    <th>Enviados</th><th>Abertura Única</th><th>CTR Único</th><th>Descadastros</th>
+  </tr></thead><tbody>` +
+  DASH_DATA.emailDisparos.map(e => `<tr>
+    <td style="color:var(--text3);font-size:11px">${e.id}</td>
+    <td style="white-space:nowrap;color:var(--text3)">${e.data}</td>
+    <td style="max-width:340px;font-size:11px">${e.campanha}</td>
+    <td>${fmtN(e.enviados)}</td>
+    <td style="color:${e.aberturaUnica>0.3?'#4CAF50':e.aberturaUnica>0.15?'#FF8C3A':'#888'};font-weight:700">${fmtPct(e.aberturaUnica)}</td>
+    <td style="font-weight:700">${fmtPct(e.ctrUnico)}</td>
+    <td style="color:${e.descadastros>0.005?'#F44336':'#888'}">${fmtPct(e.descadastros)}</td>
+  </tr>`).join('') +
+  `<tr class="total"><td colspan="3">TOTAL / MÉDIA PONDERADA</td>
+    <td>${fmtN(totSent)}</td>
+    <td style="font-weight:700;color:#4CAF50">${fmtPct(DASH_DATA.summary.emailOpenRate)}</td>
+    <td style="font-weight:700">${fmtPct(DASH_DATA.summary.emailCTR)}</td>
+    <td>${fmtPct(DASH_DATA.summary.emailUnsub)}</td>
+  </tr></tbody>`;
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+function buildCharts() {
+  const d = DASH_DATA;
+
+  // Chart 1 — Monthly volumes (stacked bar)
+  new Chart(document.getElementById('chart-monthly-volume'), {
+    type: 'bar',
+    data: {
+      labels: d.monthly.map(m => m.mes),
+      datasets: [
+        { label: 'E-mail', data: d.monthly.map(m => m.email), backgroundColor: '#555', borderRadius: 3 },
+        { label: 'Instagram', data: d.monthly.map(m => m.ig), backgroundColor: '#888', borderRadius: 3 },
+        { label: 'LinkedIn', data: d.monthly.map(m => m.li), backgroundColor: ORANGE, borderRadius: 3 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } } },
+      scales: {
+        x: { stacked: true, grid: { color: '#222' }, ticks: { font: { size: 11 } } },
+        y: { stacked: true, grid: { color: '#222' }, ticks: { stepSize: 2, font: { size: 11 } } }
+      }
+    }
+  });
+
+  // Chart 2 — LI Top5 posts by engagement (horizontal bar)
+  const liSorted = [...d.liPosts].sort((a,b) => b.engajamentos - a.engajamentos).slice(0,5);
+  new Chart(document.getElementById('chart-li-top5'), {
+    type: 'bar',
+    data: {
+      labels: liSorted.map(p => p.titulo.substring(0,40) + (p.titulo.length>40?'…':'')),
+      datasets: [{ label: 'Engajamentos', data: liSorted.map(p => p.engajamentos), backgroundColor: ORANGE, borderRadius: 4 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#222' }, ticks: { font: { size: 10 } } },
+        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+
+  // Chart 3 — LI format count
+  const formats = {};
+  d.liPosts.forEach(p => { formats[p.formato] = (formats[p.formato]||0) + 1; });
+  new Chart(document.getElementById('chart-li-format'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(formats),
+      datasets: [{ data: Object.values(formats), backgroundColor: [ORANGE, '#cc5200', '#664400', '#999'], borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12, padding: 12 } } }
+    }
+  });
+
+  // Chart 4 — Email line chart
+  new Chart(document.getElementById('chart-email-line'), {
+    type: 'line',
+    data: {
+      labels: d.emailDisparos.map(e => e.data),
+      datasets: [
+        { label: 'Taxa de Abertura', data: d.emailDisparos.map(e => +(e.aberturaUnica*100).toFixed(2)), borderColor: ORANGE, backgroundColor: 'rgba(255,102,0,0.1)', fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: ORANGE },
+        { label: 'CTR Único', data: d.emailDisparos.map(e => +(e.ctrUnico*100).toFixed(2)), borderColor: '#aaa', backgroundColor: 'rgba(170,170,170,0.05)', fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: '#aaa' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } } },
+      scales: {
+        x: { grid: { color: '#222' }, ticks: { font: { size: 10 }, maxRotation: 30 } },
+        y: { grid: { color: '#222' }, ticks: { callback: v => v + '%', font: { size: 10 } } }
+      }
+    }
+  });
+
+  // Chart 5 — Email top5 by open rate
+  const emailSorted = [...d.emailDisparos].sort((a,b) => b.aberturaUnica - a.aberturaUnica).slice(0,5);
+  new Chart(document.getElementById('chart-email-top5'), {
+    type: 'bar',
+    data: {
+      labels: emailSorted.map(e => e.campanha.substring(0,30) + '…'),
+      datasets: [{ label: 'Abertura Única', data: emailSorted.map(e => +(e.aberturaUnica*100).toFixed(2)), backgroundColor: ORANGE, borderRadius: 4 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#222' }, ticks: { callback: v => v + '%', font: { size: 10 } } },
+        y: { grid: { display: false }, ticks: { font: { size: 9 } } }
+      }
+    }
+  });
+
+  // Chart 6 — CRM bar
+  new Chart(document.getElementById('chart-crm'), {
+    type: 'bar',
+    data: {
+      labels: ['Custo (BRL → EUR ~30K)', 'CRM Realizado', 'CRM Potencial'],
+      datasets: [{
+        data: [30000, 9900, 131900],
+        backgroundColor: ['#555', '#cc5200', ORANGE],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#222' }, ticks: { callback: v => '€' + (v/1000).toFixed(0) + 'K', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  populateDom();
+  buildLITable();
+  buildIGTable();
+  buildEmailTable();
+  buildCharts();
+});
+</script>
+</body>
+</html>
+
+</body></html>
